@@ -10,7 +10,7 @@ from alembic import context
 import os
 import sys
 
-sys.path.append(os.path.join(sys.path[0], 'src'))
+sys.path.append(os.path.join(sys.path[0], "src"))
 
 from src.core.settings import settings
 from src.core.database import Base
@@ -22,7 +22,7 @@ from src.account.models import *
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "DB_DSN", settings.db_dsn)
+config.set_section_option(section, "DB_DSN", settings.db.dsn)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
