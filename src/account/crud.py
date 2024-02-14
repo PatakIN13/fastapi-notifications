@@ -7,8 +7,8 @@ from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.account.models import Account
-
 from src.account.schemas import AccountCreate
+from src.account.utils import generate_api_key
 
 
 async def get_accounts(session: AsyncSession) -> list[Account]:
@@ -45,8 +45,23 @@ async def create_account(session: AsyncSession, account_in: AccountCreate) -> Ac
     :return: created account
     :rtype Account
     """
-    account = Account(**account_in.dict(), api_key="123")
+    api_key = generate_api_key()
+    account = Account(**account_in.dict(), api_key=api_key)
     session.add(account)
     await session.commit()
 
     return account
+
+
+async def get_account_by_api_key(session: AsyncSession, api_key: str) -> Account | None:
+    """
+    Get account by API key
+    :param session: session to use for DB
+    :param api_key: API key of the account
+    :type api_key: str
+    :return: Account by API key or None
+    :rtype Account | None
+    """
+    account = select(Account).where(Account.api_key == api_key)
+    result: Result = await session.execute(account)
+    return result.scalars().first()
