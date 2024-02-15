@@ -27,7 +27,7 @@ async def check_api_key(
     :param api_key: api key to check
     :type api_key: str
     :return: Account dict if the API key is valid, raise an exception otherwise
-    :rtype dict | raise HTTPException
+    :rtype Account | raise HTTPException
     """
     unauthorized_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
