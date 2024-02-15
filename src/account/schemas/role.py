@@ -1,26 +1,22 @@
-""" Account schemas. """
-
-from datetime import datetime
+""" Role schemas. """
 
 from pydantic import BaseModel, ConfigDict
 
 
-class AccountBase(BaseModel):
+class RoleBase(BaseModel):
     """Account base schema."""
 
     name: str
 
 
-class AccountCreate(AccountBase):
+class RoleCreate(RoleBase):
     """Account create schema."""
 
     pass
 
 
-class Account(AccountBase):
+class Role(RoleBase):
     """Account schema."""
 
     model_config = ConfigDict(from_attributes=True)
     id: int
-    created_at: datetime
-    api_key: str

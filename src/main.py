@@ -5,19 +5,21 @@ This is the main file of the project. It is responsible for creating the FastAPI
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from src.account.router import router as router_account
+from src.account.routers import router_account, router_role
 
 from src.core.settings import settings
 
 
 app = FastAPI()
 app.include_router(router_account, prefix=settings.main_url)
+app.include_router(router_role, prefix=settings.main_url)
 
 
 class Status(BaseModel):
     """
     Status server response
     """
+
     status: str = "ok"
 
 

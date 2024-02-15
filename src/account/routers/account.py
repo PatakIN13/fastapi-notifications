@@ -1,13 +1,12 @@
 """Account router module."""
 
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security.api_key import APIKey
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import db_helper
-from src.account import crud
+from src.account.cruds import account as crud
 from src.account.schemas import Account, AccountCreate
-from src.account.auth import check_api_key
+from src.account.auth import check_api_key, check_admin
 
 router = APIRouter(
     prefix="/account",
@@ -20,7 +19,7 @@ router = APIRouter(
     response_model=list[Account],
 )
 async def get_accounts(
-    account: APIKey = Depends(check_api_key),
+    admin: bool = Depends(check_admin),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """Get all accounts."""
@@ -30,22 +29,31 @@ async def get_accounts(
 @router.post("/", response_model=Account)
 async def create_account(
     account_in: AccountCreate,
-    account: APIKey = Depends(check_api_key),
+    admin: bool = Depends(check_admin),
     session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ):
     """Create account."""
     return await crud.create_account(session=session, account_in=account_in)
 
 
-@router.get("/{account_id}/", response_model=Account)
+@router.get("/me/", response_model=Account)
 async def get_account(
-    account_id: int,
-    account: APIKey = Depends(check_api_key),
+    account: Account = Depends(check_api_key),
 ):
     """Get account by id."""
-    if account.id != account_id:
+    return account
+
+
+@router.get("/api_key/", response_model=Account)
+async def get_account_by_api_key(
+    api_key: str,
+    admin: bool = Depends(check_admin),
+    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    """Get account by API key."""
+    account = await crud.get_account_by_api_key(session=session, api_key=api_key)
+    if account is None:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Forbidden",
+            status_code=status.HTTP_404_NOT_FOUND, detail="Account not found"
         )
     return account
