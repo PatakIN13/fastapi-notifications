@@ -24,7 +24,10 @@ async def get_accounts(session: AsyncSession) -> list[Account]:
     return list(accounts)
 
 
-async def get_account(session: AsyncSession, account_id: int) -> Account | None:
+async def get_account(
+    session: AsyncSession,
+    account_id: int,
+) -> Account | None:
     """
     Get account by id
     :param session: session to use for DB
@@ -36,7 +39,10 @@ async def get_account(session: AsyncSession, account_id: int) -> Account | None:
     return await session.get(Account, account_id)
 
 
-async def create_account(session: AsyncSession, account_in: AccountCreate) -> Account:
+async def create_account(
+    session: AsyncSession,
+    account_in: AccountCreate,
+) -> Account:
     """
     Create account
     :param session: session to use for DB
@@ -53,7 +59,10 @@ async def create_account(session: AsyncSession, account_in: AccountCreate) -> Ac
     return account
 
 
-async def get_account_by_api_key(session: AsyncSession, api_key: str) -> Account | None:
+async def get_account_by_api_key(
+    session: AsyncSession,
+    api_key: str,
+) -> Account | None:
     """
     Get account by API key
     :param session: session to use for DB
@@ -65,3 +74,24 @@ async def get_account_by_api_key(session: AsyncSession, api_key: str) -> Account
     account = select(Account).where(Account.api_key == api_key)
     result: Result = await session.execute(account)
     return result.scalars().first()
+
+
+async def update_role_account(
+    session: AsyncSession,
+    account: Account,
+    role_id: int,
+) -> Account | None:
+    """
+    Update role account
+    :param session: session to use for DB
+    :param account: account to update
+    :type account: Account
+    :param role_id: ID of the role
+    :type role_id: int
+    :return: updated account
+    :rtype Account | None if role not found
+    """
+    setattr(account, "role_id", role_id)
+
+    await session.commit()
+    return account

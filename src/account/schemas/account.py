@@ -11,17 +11,22 @@ class AccountBase(BaseModel):
     name: str
 
 
-class AccountCreate(AccountBase):
+class AccountRole(BaseModel):
+    """Account role schema."""
+
+    role_id: int
+
+
+class AccountCreate(AccountBase, AccountRole):
     """Account create schema."""
 
     pass
 
 
-class Account(AccountBase):
+class Account(AccountBase, AccountRole):
     """Account schema."""
 
     model_config = ConfigDict(from_attributes=True)
     id: int
     created_at: datetime
     api_key: str
-    role_id: int
