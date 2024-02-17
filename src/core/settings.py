@@ -3,6 +3,8 @@ Settings module for the project.
 It uses pydantic_settings to load settings from environment variables and .env file.
 """
 
+from typing import Literal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -19,6 +21,7 @@ class Settings(BaseSettings):
     """Settings class."""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    mode: Literal["development", "production", "testing"] = "development"
 
     main_url: str = "/"
     secret_key: str = "secret"
