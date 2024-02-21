@@ -1,16 +1,13 @@
 """Role check privilege."""
 
 from fastapi import HTTPException, status, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.database import db_helper
 from src.account.auth.apikey import auth_api_key
 from src.account.schemas import Account
-from src.account.cruds.role import get_role
+from src.account.repository.role import RoleRepository
 
 
 async def auth_role_privilege(
-    session: AsyncSession = Depends(db_helper.scoped_session_dependency),
     account: Account = Depends(auth_api_key),
 ) -> Account | HTTPException:
     """Check if the account has enough privileges."""
@@ -20,7 +17,7 @@ async def auth_role_privilege(
     )
     if account.role_id == -1:
         return account
-    role = await get_role(session=session, role_id=account.role_id)
+    role = await RoleRepository.find_by_id(model_id=account.role_id)
     if role is None or role.name != "admin":
         raise unauthorized_exception
 
